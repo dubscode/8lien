@@ -1,12 +1,13 @@
-import { v } from "convex/values";
-import { QueryCtx, mutation, query } from "./_generated/server";
+import { QueryCtx, mutation, query } from './_generated/server';
+
+import { v } from 'convex/values';
 
 export const store = mutation({
   args: {},
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
-      throw new Error("Called storeUser without authentication present");
+      throw new Error('Called storeUser without authentication present');
     }
     const user = await getUser(ctx, identity.nickname!);
     if (user !== null) {
@@ -20,34 +21,36 @@ export const store = mutation({
           tokenIdentifier: identity.tokenIdentifier,
           name: identity.name,
           username: identity.nickname,
-          pictureUrl: identity.pictureUrl,
+          pictureUrl: identity.pictureUrl
         });
       }
       return user._id;
     }
     // If it's a new identity, create a new `User`.
-    return await ctx.db.insert("users", {
+    return await ctx.db.insert('users', {
       tokenIdentifier: identity.tokenIdentifier,
       name: identity.name!,
       username: identity.nickname!,
       pictureUrl: identity.pictureUrl!,
       numPosts: 0,
+      superAdmin: false,
+      userId: String(identity.userId)
     });
-  },
+  }
 });
 
 export const get = query({
   args: {
-    username: v.string(),
+    username: v.string()
   },
   handler: async (ctx, args) => {
     return await getUser(ctx, args.username);
-  },
+  }
 });
 
 export async function getUser(ctx: QueryCtx, username: string) {
   return await ctx.db
-    .query("users")
-    .withIndex("username", (q) => q.eq("username", username))
+    .query('users')
+    .withIndex('username', (q) => q.eq('username', username))
     .unique();
 }
