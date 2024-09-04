@@ -34,7 +34,7 @@ export default function Page() {
       {object && (
         <div>
           <h2>Generated Monster</h2>
-          <pre>{JSON.stringify(object, null, 2)}</pre>
+          <pre className='w-96'>{JSON.stringify(object, null, 2)}</pre>
         </div>
       )}
 
