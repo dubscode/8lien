@@ -1,5 +1,6 @@
 import '@/assets/globals.css';
 
+import { Analytics } from '@vercel/analytics/react';
 import ConvexClientProvider from './ConvexClientProvider';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
@@ -33,6 +34,7 @@ export default function RootLayout({
           >
             {children}
             <Toaster />
+            <Analytics />
           </ThemeProvider>
         </ConvexClientProvider>
       </body>
