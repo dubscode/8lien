@@ -1,5 +1,6 @@
 import { mutation, query } from './_generated/server';
 
+import { api } from './_generated/api';
 import { v } from 'convex/values';
 
 export const all = query({
@@ -7,7 +8,19 @@ export const all = query({
   handler: async (ctx, args) => {
     const result = await ctx.db.query('monsters').order('asc').collect();
 
-    return result;
+    return Promise.all(
+      result.map(async (monster) => {
+        const monsterImage = await ctx.db
+          .query('images')
+          .filter((q) => q.eq(q.field('monsterId'), monster._id))
+          .first();
+        if (monsterImage) {
+          monster.imageUrl =
+            (await ctx.storage.getUrl(monsterImage.storageId)) || '';
+        }
+        return monster;
+      })
+    );
   }
 });
 
@@ -19,6 +32,17 @@ export const get = query({
     const monster = await ctx.db.get(args.id);
     if (monster === null) {
       return null;
+    }
+
+    // Find images for the monster
+    const monsterImage = await ctx.db
+      .query('images')
+      .filter((q) => q.eq(q.field('monsterId'), monster._id))
+      .first();
+
+    if (monsterImage) {
+      monster.imageUrl =
+        (await ctx.storage.getUrl(monsterImage.storageId)) || '';
     }
     return monster;
   }
@@ -57,11 +81,20 @@ export const create = mutation({
       throw new Error('Called createMonster without being authenticated');
     }
 
-    await ctx.db.insert('monsters', {
+    const newMonster = await ctx.db.insert('monsters', {
       ...args,
       countdownTimer: 0,
       dangerousVotes: 0,
       safeVotes: 0
     });
+
+    if (newMonster) {
+      // generate and store an image for the new monster
+      await ctx.scheduler.runAfter(0, api.images.generateAndStoreAiImage, {
+        monsterId: newMonster
+      });
+    }
+
+    return newMonster;
   }
 });

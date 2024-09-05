@@ -52,6 +52,11 @@ export default defineSchema({
     authorId: v.id('users'),
     text: v.string()
   }).index('authorId', ['authorId']),
+  images: defineTable({
+    storageId: v.id('_storage'),
+    monsterId: v.id('monsters'),
+    prompt: v.string()
+  }),
   tokenLogs: defineTable({
     promptTokens: v.number(),
     completionTokens: v.number(),
