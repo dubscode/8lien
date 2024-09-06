@@ -48,6 +48,38 @@ export const get = query({
   }
 });
 
+export const voteDown = mutation({
+  args: { id: v.id('monsters') },
+  handler: async (ctx, args) => {
+    const monster = await ctx.db.get(args.id);
+    if (monster === null) {
+      return null;
+    }
+
+    await ctx.db.patch(monster._id, {
+      dangerousVotes: monster.dangerousVotes + 1
+    });
+
+    return monster.dangerousVotes + 1;
+  }
+});
+
+export const voteUp = mutation({
+  args: { id: v.id('monsters') },
+  handler: async (ctx, args) => {
+    const monster = await ctx.db.get(args.id);
+    if (monster === null) {
+      return null;
+    }
+
+    await ctx.db.patch(monster._id, {
+      safeVotes: monster.safeVotes + 1
+    });
+
+    return monster.safeVotes + 1;
+  }
+});
+
 export const create = mutation({
   args: {
     generationId: v.optional(v.string()),

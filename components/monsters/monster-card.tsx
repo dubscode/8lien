@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { MonsterDossier } from './monster-dossier';
 import { api } from '@/convex/_generated/api';
 import monsterPlaceholder from '@/assets/monster-placeholder-loading.png';
+import { useAuth } from '@clerk/nextjs';
 import { useMutation } from 'convex/react';
 
 type MonsterCardProps = {
@@ -18,10 +19,12 @@ type MonsterCardProps = {
 };
 
 export default function MonsterCard({ monster }: MonsterCardProps) {
+  const { isSignedIn } = useAuth();
   const [showResearch, setShowResearch] = useState(false);
   const [timeLeft, setTimeLeft] = useState(monster.countdownTimer);
 
-  const voteForMonster = () => console.log('Voting for monster');
+  const voteUp = useMutation(api.monsters.voteUp);
+  const voteDown = useMutation(api.monsters.voteDown);
 
   // useEffect(() => {
   //   if (timeLeft > 0) {
@@ -32,9 +35,12 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
   //   }
   // }, [timeLeft]);
 
-  const handleVote = (safety: 'SAFE' | 'DANGEROUS') => {
-    // TODO - Implement voting
-    // voteForMonster({ monsterId: monster._id, safety });
+  const handleVoteUp = () => {
+    isSignedIn && voteUp({ id: monster._id });
+  };
+
+  const handleVoteDown = () => {
+    isSignedIn && voteDown({ id: monster._id });
   };
 
   return (
@@ -71,18 +77,20 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
 
         <div className='w-full text-center'>
           <p className='mb-2 text-xl font-semibold'>Time Left: {timeLeft}s</p>
+          {!isSignedIn ? (
+            <p className='mb-2 text-sm font-semibold text-destructive'>
+              You must be signed in to vote
+            </p>
+          ) : null}
           <div className='mb-4 flex justify-center space-x-4'>
             <Button
               className='flex flex-row items-center'
-              onClick={() => handleVote('SAFE')}
-              disabled={showResearch}
+              onClick={() => handleVoteUp()}
+              disabled={!isSignedIn}
             >
               <ThumbsUp className='mr-3' /> ({monster.safeVotes})
             </Button>
-            <Button
-              onClick={() => handleVote('DANGEROUS')}
-              disabled={showResearch}
-            >
+            <Button onClick={() => handleVoteDown()} disabled={!isSignedIn}>
               <ThumbsDown className='mr-3' /> ({monster.dangerousVotes})
             </Button>
             <Button onClick={() => setShowResearch(!showResearch)}>
