@@ -1,20 +1,20 @@
 'use client';
 
-import { Doc } from '@/convex/_generated/dataModel';
+import { Id } from '@/convex/_generated/dataModel';
+import { api } from '@/convex/_generated/api';
+import { useQuery } from 'convex/react';
 
 type MonsterDossierProps = {
-  monster: Doc<'monsters'>;
-  showResearch: boolean;
+  monsterId: Id<'monsters'>;
 };
 
-export const MonsterDossier = ({
-  monster,
-  showResearch
-}: MonsterDossierProps) => {
-  if (!showResearch) return null;
+export const MonsterDossier = ({ monsterId }: MonsterDossierProps) => {
+  const monster = useQuery(api.monsters.get, { id: monsterId });
+
+  if (!monster) return null;
 
   return (
-    <div className='bg-secondary/10 w-full rounded-lg p-4'>
+    <div className='w-full rounded-lg bg-secondary/10 p-4'>
       <h3 className='mb-2 text-xl font-semibold'>Research Dossier</h3>
       <div className='space-y-2 text-sm'>
         <p>

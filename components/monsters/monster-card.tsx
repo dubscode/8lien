@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Doc } from '@/convex/_generated/dataModel';
+import { Id } from '@/convex/_generated/dataModel';
 import Image from 'next/image';
 import { MonsterDossier } from './monster-dossier';
 import { api } from '@/convex/_generated/api';
@@ -16,7 +16,13 @@ import { useMutation } from 'convex/react';
 import { useState } from 'react';
 
 type MonsterCardProps = {
-  monster: Doc<'monsters'>;
+  monster: {
+    _id: Id<'monsters'>;
+    name: string;
+    imageUrl?: string;
+    safeVotes: number;
+    dangerousVotes: number;
+  };
 };
 
 export default function MonsterCard({ monster }: MonsterCardProps) {
@@ -91,7 +97,7 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
           </div>
         </div>
 
-        <MonsterDossier monster={monster} showResearch={showResearch} />
+        {showResearch ? <MonsterDossier monsterId={monster._id} /> : null}
       </CardContent>
     </Card>
   );

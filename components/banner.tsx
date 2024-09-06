@@ -10,8 +10,7 @@ export function Banner() {
     >
       <AlertTitle>New Monsters Incoming!</AlertTitle>
       <AlertDescription className='animate-pulse'>
-        A new monster is generated every 5 minutes. Stay tuned for fresh
-        creatures!
+        A new monster is generated every hour. Stay tuned for fresh creatures!
       </AlertDescription>
     </Alert>
   );

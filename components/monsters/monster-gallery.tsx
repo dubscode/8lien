@@ -51,7 +51,7 @@ export default function MonsterGallery() {
   );
 
   useEffect(() => {
-    status === 'CanLoadMore' && loadMore(25);
+    status === 'CanLoadMore' && loadMore(20);
 
     const initializeCarousel = async () => {
       if (carouselApi && monsters) {

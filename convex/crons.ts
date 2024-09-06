@@ -5,7 +5,7 @@ const crons = cronJobs();
 
 crons.interval(
   'generate a new monster',
-  { minutes: 5 }, // every 5 minutes
+  { hours: 1 }, // every 1 hour
   api.genMonster.generateMonsterObject,
   {}
 );

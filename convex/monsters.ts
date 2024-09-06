@@ -45,7 +45,13 @@ export const paginatedMonsters = query({
             monster.imageUrl =
               (await ctx.storage.getUrl(monsterImage.storageId)) || '';
           }
-          return monster;
+          return {
+            _id: monster._id,
+            name: monster.name,
+            imageUrl: monster.imageUrl,
+            safeVotes: monster.safeVotes,
+            dangerousVotes: monster.dangerousVotes
+          };
         })
       )
     };
@@ -80,7 +86,7 @@ export const top50monsters = query({
       .query('monsters')
       .withIndex('byLikes')
       .order('desc')
-      .take(50);
+      .take(25);
 
     return Promise.all(
       result.map(async (monster) => {
@@ -92,7 +98,13 @@ export const top50monsters = query({
           monster.imageUrl =
             (await ctx.storage.getUrl(monsterImage.storageId)) || '';
         }
-        return monster;
+        return {
+          _id: monster._id,
+          name: monster.name,
+          imageUrl: monster.imageUrl,
+          safeVotes: monster.safeVotes,
+          dangerousVotes: monster.dangerousVotes
+        };
       })
     );
   }
