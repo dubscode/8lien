@@ -76,11 +76,6 @@ export const create = mutation({
     weaknesses: v.array(v.string())
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (identity === null) {
-      throw new Error('Called createMonster without being authenticated');
-    }
-
     const newMonster = await ctx.db.insert('monsters', {
       ...args,
       countdownTimer: 0,

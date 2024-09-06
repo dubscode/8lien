@@ -3,7 +3,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { api } from '@/convex/_generated/api';
+import monsterPlaceholder from '@/assets/monster-placeholder-loading.png';
 import { useQuery } from 'convex/react';
 
 export default function MonsterLeaderboard() {
@@ -25,24 +27,26 @@ export default function MonsterLeaderboard() {
       </CardHeader>
       <CardContent>
         {sortedMonsters?.map((monster, index) => (
-          <div key={monster._id} className='mb-4 flex items-center space-x-4'>
-            <div className='text-2xl font-bold'>{index + 1}.</div>
-            <div className='relative h-12 w-12'>
-              <Image
-                src={monster.imageUrl || '/placeholder.svg?height=48&width=48'}
-                alt={monster.name}
-                layout='fill'
-                objectFit='cover'
-                className='rounded-full'
-              />
+          <Link key={monster._id} href={`/monsters?slide=${index + 1}`}>
+            <div key={monster._id} className='mb-4 flex items-center space-x-4'>
+              <div className='text-2xl font-bold'>{index + 1}.</div>
+              <div className='relative h-12 w-12'>
+                <Image
+                  src={monster.imageUrl || monsterPlaceholder}
+                  alt={monster.name}
+                  layout='fill'
+                  objectFit='cover'
+                  className='rounded-full'
+                />
+              </div>
+              <div className='flex-grow'>
+                <p className='font-semibold'>{monster.name}</p>
+                <p className='text-sm text-gray-500'>
+                  Votes: {monster.safeVotes + monster.dangerousVotes}
+                </p>
+              </div>
             </div>
-            <div className='flex-grow'>
-              <p className='font-semibold'>{monster.name}</p>
-              <p className='text-sm text-gray-500'>
-                Votes: {monster.safeVotes + monster.dangerousVotes}
-              </p>
-            </div>
-          </div>
+          </Link>
         ))}
       </CardContent>
     </Card>

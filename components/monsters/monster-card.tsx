@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { Doc } from '@/convex/_generated/dataModel';
 import Image from 'next/image';
 import { MonsterDossier } from './monster-dossier';
 import { api } from '@/convex/_generated/api';
+import monsterPlaceholder from '@/assets/monster-placeholder-loading.png';
 import { useMutation } from 'convex/react';
 
 type MonsterCardProps = {
@@ -36,7 +38,7 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
   };
 
   return (
-    <Card className='bg-primary/5 border-primary/20 mx-auto w-full max-w-2xl border-2'>
+    <Card className='mx-auto w-full max-w-2xl border-2 border-primary/20 bg-primary/5'>
       <CardHeader>
         <CardTitle className='text-center text-2xl font-bold'>
           {monster.name}
@@ -45,11 +47,9 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
       <CardContent className='flex flex-col items-center space-y-4'>
         <Dialog>
           <DialogTrigger asChild>
-            <div className='relative h-64 w-64 cursor-pointer'>
+            <div className='relative size-96 cursor-pointer'>
               <Image
-                src={
-                  monster.imageUrl || '/placeholder.svg?height=256&width=256'
-                }
+                src={monster.imageUrl || monsterPlaceholder}
                 alt={monster.name}
                 layout='fill'
                 objectFit='cover'
@@ -60,9 +60,7 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
           <DialogContent className='max-w-3xl'>
             <div className='relative h-[80vh] w-full'>
               <Image
-                src={
-                  monster.imageUrl || '/placeholder.svg?height=1024&width=1024'
-                }
+                src={monster.imageUrl || monsterPlaceholder}
                 alt={monster.name}
                 layout='fill'
                 objectFit='contain'
@@ -74,14 +72,18 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
         <div className='w-full text-center'>
           <p className='mb-2 text-xl font-semibold'>Time Left: {timeLeft}s</p>
           <div className='mb-4 flex justify-center space-x-4'>
-            <Button onClick={() => handleVote('SAFE')} disabled={showResearch}>
-              Safe ({monster.safeVotes})
+            <Button
+              className='flex flex-row items-center'
+              onClick={() => handleVote('SAFE')}
+              disabled={showResearch}
+            >
+              <ThumbsUp className='mr-3' /> ({monster.safeVotes})
             </Button>
             <Button
               onClick={() => handleVote('DANGEROUS')}
               disabled={showResearch}
             >
-              Dangerous ({monster.dangerousVotes})
+              <ThumbsDown className='mr-3' /> ({monster.dangerousVotes})
             </Button>
             <Button onClick={() => setShowResearch(!showResearch)}>
               {showResearch ? 'Hide' : 'Show'} Dossier
