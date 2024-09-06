@@ -61,7 +61,15 @@ export const topExistingMonsters = query({
       .order('desc')
       .take(50);
 
-    return result;
+    return result.map((monster) => {
+      return {
+        id: monster._id,
+        name: monster.name,
+        abilities: monster.abilities,
+        appearance: monster.appearance,
+        threatLevel: monster.threatLevel
+      };
+    });
   }
 });
 
