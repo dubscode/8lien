@@ -105,6 +105,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
   - Clerk
   - Convex
   - Next.js
+  - ChatGPT to help create better prompts
+  - v0.dev for making the UI much easier and faster to create
 
 ## Contact
 
