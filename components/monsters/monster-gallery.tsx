@@ -47,6 +47,8 @@ export default function MonsterGallery() {
   const [currentSlide, setCurrentSlide] = useState(initialSlide);
 
   useEffect(() => {
+    status === 'CanLoadMore' && loadMore(50);
+
     if (carouselApi && monsters) {
       const validInitialSlide = Math.min(
         Math.max(initialSlide, 1),
@@ -55,7 +57,8 @@ export default function MonsterGallery() {
       carouselApi.scrollTo(validInitialSlide - 1, true);
       setCurrentSlide(validInitialSlide);
     }
-  }, [carouselApi, monsters, initialSlide]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [carouselApi, monsters, initialSlide, status]);
 
   useEffect(() => {
     if (carouselApi) {
@@ -73,8 +76,6 @@ export default function MonsterGallery() {
   }, [carouselApi, router]);
 
   const handlePaginationClick = (index: number) => {
-    status === 'CanLoadMore' && loadMore(50);
-
     if (carouselApi) {
       carouselApi.scrollTo(index - 1);
     }
