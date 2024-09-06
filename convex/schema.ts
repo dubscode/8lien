@@ -48,10 +48,6 @@ export default defineSchema({
   })
     .index('tokenIdentifier', ['tokenIdentifier'])
     .index('username', ['username']),
-  posts: defineTable({
-    authorId: v.id('users'),
-    text: v.string()
-  }).index('authorId', ['authorId']),
   images: defineTable({
     storageId: v.id('_storage'),
     monsterId: v.id('monsters'),

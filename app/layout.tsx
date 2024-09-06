@@ -1,7 +1,8 @@
 import '@/assets/globals.css';
 
 import { Analytics } from '@vercel/analytics/react';
-import ConvexClientProvider from './ConvexClientProvider';
+import { ClerkProvider } from '@clerk/nextjs';
+import ConvexClientProvider from '@/components/ConvexClientProvider';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -26,16 +27,20 @@ export default function RootLayout({
     <html lang='en' suppressHydrationWarning>
       <body className={inter.className}>
         <ConvexClientProvider>
-          <ThemeProvider
-            attribute='class'
-            defaultTheme='system'
-            enableSystem
-            disableTransitionOnChange
+          <ClerkProvider
+            publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY!}
           >
-            {children}
-            <Toaster />
-            <Analytics />
-          </ThemeProvider>
+            <ThemeProvider
+              attribute='class'
+              defaultTheme='system'
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster />
+              <Analytics />
+            </ThemeProvider>
+          </ClerkProvider>
         </ConvexClientProvider>
       </body>
     </html>

@@ -27,7 +27,7 @@ export default function MonsterLeaderboard() {
       </CardHeader>
       <CardContent>
         {sortedMonsters?.map((monster, index) => (
-          <Link key={monster._id} href={`/monsters?slide=${index + 1}`}>
+          <Link key={monster._id} href={`?slide=${index + 1}`}>
             <div key={monster._id} className='mb-4 flex items-center space-x-4'>
               <div className='text-2xl font-bold'>{index + 1}.</div>
               <div className='relative h-12 w-12'>
