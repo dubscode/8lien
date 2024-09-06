@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { MonsterDossier } from './monster-dossier';
 import { api } from '@/convex/_generated/api';
 import monsterPlaceholder from '@/assets/monster-placeholder-loading.png';
+import { track } from '@vercel/analytics';
 import { useAuth } from '@clerk/nextjs';
 import { useMutation } from 'convex/react';
 import { useState } from 'react';
@@ -27,10 +28,12 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
 
   const handleVoteUp = () => {
     isSignedIn && voteUp({ id: monster._id });
+    track('monster_voted_up', { monsterId: monster._id });
   };
 
   const handleVoteDown = () => {
     isSignedIn && voteDown({ id: monster._id });
+    track('monster_voted_down', { monsterId: monster._id });
   };
 
   return (
