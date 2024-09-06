@@ -12,7 +12,10 @@ export const generateMonsterObject = action({
     ctx,
     args
   ): Promise<z.infer<typeof GenerateMonsterSchema>> => {
-    const existingMonsters = await ctx.runQuery(api.monsters.all, {});
+    const existingMonsters = await ctx.runQuery(
+      api.monsters.topExistingMonsters,
+      {}
+    );
 
     if (!existingMonsters || existingMonsters.length === 0) {
       throw new Error('Monsters not found');

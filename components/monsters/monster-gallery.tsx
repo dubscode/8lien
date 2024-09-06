@@ -18,7 +18,7 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination';
-import { useQuery } from 'convex/react';
+import { usePaginatedQuery } from 'convex/react';
 import MonsterCard from '@/components/monsters/monster-card';
 import MonsterLeaderboard from '@/components/monsters/monster-leaderboard';
 import { api } from '@/convex/_generated/api';
@@ -26,7 +26,15 @@ import { type CarouselApi } from '@/components/ui/carousel';
 import _ from 'lodash';
 
 export default function MonsterGallery() {
-  const monsters = useQuery(api.monsters.all, {});
+  const {
+    results: monsters,
+    status,
+    loadMore
+  } = usePaginatedQuery(
+    api.monsters.paginatedMonsters,
+    {},
+    { initialNumItems: 20 }
+  );
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -65,6 +73,8 @@ export default function MonsterGallery() {
   }, [carouselApi, router]);
 
   const handlePaginationClick = (index: number) => {
+    status === 'CanLoadMore' && loadMore(50);
+
     if (carouselApi) {
       carouselApi.scrollTo(index - 1);
     }

@@ -1,6 +1,7 @@
 import { mutation, query } from './_generated/server';
 
 import { api } from './_generated/api';
+import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 export const all = query({
@@ -21,6 +22,46 @@ export const all = query({
         return monster;
       })
     );
+  }
+});
+
+export const paginatedMonsters = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const results = await ctx.db
+      .query('monsters')
+      .order('asc')
+      .paginate(args.paginationOpts);
+
+    return {
+      ...results,
+      page: await Promise.all(
+        results.page.map(async (monster) => {
+          const monsterImage = await ctx.db
+            .query('images')
+            .filter((q) => q.eq(q.field('monsterId'), monster._id))
+            .first();
+          if (monsterImage) {
+            monster.imageUrl =
+              (await ctx.storage.getUrl(monsterImage.storageId)) || '';
+          }
+          return monster;
+        })
+      )
+    };
+  }
+});
+
+export const topExistingMonsters = query({
+  args: {},
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query('monsters')
+      .withIndex('byLikes')
+      .order('desc')
+      .take(50);
+
+    return result;
   }
 });
 

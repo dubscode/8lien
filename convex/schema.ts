@@ -35,7 +35,8 @@ export default defineSchema({
     generationId: v.optional(v.string())
   })
     .index('name', ['name'])
-    .index('safetyLevel', ['safetyLevel']),
+    .index('safetyLevel', ['safetyLevel'])
+    .index('byLikes', ['safeVotes']),
   users: defineTable({
     // Unique identifier from the auth provider
     tokenIdentifier: v.string(),
