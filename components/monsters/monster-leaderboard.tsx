@@ -10,7 +10,7 @@ import monsterPlaceholder from '@/assets/monster-placeholder-loading.png';
 import { useQuery } from 'convex/react';
 
 export default function MonsterLeaderboard() {
-  const monsters = useQuery(api.monsters.all, {});
+  const monsters = useQuery(api.monsters.top50monsters, {});
 
   const sortedMonsters = monsters
     ?.sort(
@@ -30,10 +30,8 @@ export default function MonsterLeaderboard() {
       </CardHeader>
       <CardContent>
         {sortedMonsters?.map((monster, index) => {
-          const monsterIndex =
-            sortedByCreationDate.findIndex((m) => m._id === monster._id) + 1;
           return (
-            <Link key={monster._id} href={`?slide=${monsterIndex}`}>
+            <Link key={monster._id} href={`?slide=${monster._id}`}>
               <div
                 key={monster._id}
                 className='mb-4 flex items-center space-x-4'

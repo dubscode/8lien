@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Carousel,
@@ -33,39 +33,57 @@ export default function MonsterGallery() {
   } = usePaginatedQuery(
     api.monsters.paginatedMonsters,
     {},
-    { initialNumItems: 20 }
+    { initialNumItems: 50 }
   );
 
   const searchParams = useSearchParams();
   const router = useRouter();
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 
-  const initialSlide = Math.max(
-    1,
-    parseInt(searchParams.get('slide') || '1', 10)
+  const requestedMonsterId = searchParams.get('slide') || '';
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const findMonsterIndex = useCallback(
+    (id: string) => {
+      return monsters?.findIndex((monster) => monster._id === id) ?? -1;
+    },
+    [monsters]
   );
-  const [currentSlide, setCurrentSlide] = useState(initialSlide);
 
   useEffect(() => {
-    status === 'CanLoadMore' && loadMore(50);
+    status === 'CanLoadMore' && loadMore(25);
 
-    if (carouselApi && monsters) {
-      const validInitialSlide = Math.min(
-        Math.max(initialSlide, 1),
-        monsters.length
-      );
-      carouselApi.scrollTo(validInitialSlide - 1, true);
-      setCurrentSlide(validInitialSlide);
-    }
+    const initializeCarousel = async () => {
+      if (carouselApi && monsters) {
+        let index = findMonsterIndex(requestedMonsterId);
+        if (index === -1 && status === 'CanLoadMore') {
+          console.log('Loading more and checking again');
+          index = 1;
+          // index = await loadMoreAndCheckAgain();
+        }
+        if (index !== -1) {
+          carouselApi.scrollTo(index, true);
+          setCurrentSlide(index);
+        } else {
+          carouselApi.scrollTo(0, true);
+          setCurrentSlide(0);
+        }
+      }
+    };
+
+    initializeCarousel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [carouselApi, monsters, initialSlide, status]);
+  }, [carouselApi, monsters, requestedMonsterId, findMonsterIndex, status]);
 
   useEffect(() => {
     if (carouselApi) {
       const onSelect = () => {
-        const selectedIndex = carouselApi.selectedScrollSnap() + 1;
+        const selectedIndex = carouselApi.selectedScrollSnap();
         setCurrentSlide(selectedIndex);
-        router.push(`?slide=${selectedIndex}`, { scroll: false });
+        const selectedMonsterId = monsters?.[selectedIndex]?._id;
+        if (selectedMonsterId) {
+          router.push(`?slide=${selectedMonsterId}`, { scroll: false });
+        }
       };
 
       carouselApi.on('select', onSelect);
@@ -73,11 +91,11 @@ export default function MonsterGallery() {
         carouselApi.off('select', onSelect);
       };
     }
-  }, [carouselApi, router]);
+  }, [carouselApi, router, monsters]);
 
   const handlePaginationClick = (index: number) => {
     if (carouselApi) {
-      carouselApi.scrollTo(index - 1);
+      carouselApi.scrollTo(index);
     }
   };
 
@@ -89,46 +107,46 @@ export default function MonsterGallery() {
     const maxVisiblePages = 5;
 
     if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
+      for (let i = 0; i < totalPages; i++) {
         items.push(
           <PaginationItem key={i}>
             <PaginationLink
               onClick={() => handlePaginationClick(i)}
               isActive={currentSlide === i}
             >
-              {i}
+              {i + 1}
             </PaginationLink>
           </PaginationItem>
         );
       }
     } else {
       const startPage = Math.max(
-        1,
-        Math.min(currentSlide - 2, totalPages - maxVisiblePages + 1)
+        0,
+        Math.min(currentSlide - 2, totalPages - maxVisiblePages)
       );
-      const endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+      const endPage = Math.min(startPage + maxVisiblePages, totalPages);
 
-      if (startPage > 1) {
+      if (startPage > 0) {
         items.push(
           <PaginationItem key='start'>
-            <PaginationLink onClick={() => handlePaginationClick(1)}>
+            <PaginationLink onClick={() => handlePaginationClick(0)}>
               1
             </PaginationLink>
           </PaginationItem>
         );
-        if (startPage > 2) {
+        if (startPage > 1) {
           items.push(<PaginationEllipsis key='ellipsis-start' />);
         }
       }
 
-      for (let i = startPage; i <= endPage; i++) {
+      for (let i = startPage; i < endPage; i++) {
         items.push(
           <PaginationItem key={i}>
             <PaginationLink
               onClick={() => handlePaginationClick(i)}
               isActive={currentSlide === i}
             >
-              {i}
+              {i + 1}
             </PaginationLink>
           </PaginationItem>
         );
@@ -140,7 +158,9 @@ export default function MonsterGallery() {
         }
         items.push(
           <PaginationItem key='end'>
-            <PaginationLink onClick={() => handlePaginationClick(totalPages)}>
+            <PaginationLink
+              onClick={() => handlePaginationClick(totalPages - 1)}
+            >
               {totalPages}
             </PaginationLink>
           </PaginationItem>
@@ -168,7 +188,7 @@ export default function MonsterGallery() {
                 <CarouselContent>
                   {_.orderBy(monsters, '_creationTime').map(
                     (monster, index) => (
-                      <CarouselItem key={index}>
+                      <CarouselItem key={monster._id}>
                         <MonsterCard monster={monster} />
                       </CarouselItem>
                     )
@@ -183,7 +203,7 @@ export default function MonsterGallery() {
                     <PaginationItem>
                       <PaginationPrevious
                         onClick={() =>
-                          handlePaginationClick(Math.max(1, currentSlide - 1))
+                          handlePaginationClick(Math.max(0, currentSlide - 1))
                         }
                       />
                     </PaginationItem>
@@ -192,7 +212,7 @@ export default function MonsterGallery() {
                       <PaginationNext
                         onClick={() =>
                           handlePaginationClick(
-                            Math.min(monsters.length, currentSlide + 1)
+                            Math.min(monsters.length - 1, currentSlide + 1)
                           )
                         }
                       />

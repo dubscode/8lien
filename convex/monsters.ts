@@ -65,6 +65,31 @@ export const topExistingMonsters = query({
   }
 });
 
+export const top50monsters = query({
+  args: {},
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query('monsters')
+      .withIndex('byLikes')
+      .order('desc')
+      .take(50);
+
+    return Promise.all(
+      result.map(async (monster) => {
+        const monsterImage = await ctx.db
+          .query('images')
+          .filter((q) => q.eq(q.field('monsterId'), monster._id))
+          .first();
+        if (monsterImage) {
+          monster.imageUrl =
+            (await ctx.storage.getUrl(monsterImage.storageId)) || '';
+        }
+        return monster;
+      })
+    );
+  }
+});
+
 export type Monster = NonNullable<Awaited<ReturnType<typeof get>>>;
 
 export const get = query({
