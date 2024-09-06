@@ -6,7 +6,7 @@ import { v } from 'convex/values';
 export const all = query({
   args: {},
   handler: async (ctx, args) => {
-    const result = await ctx.db.query('monsters').order('asc').collect();
+    const result = await ctx.db.query('monsters').order('asc').take(50);
 
     return Promise.all(
       result.map(async (monster) => {
