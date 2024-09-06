@@ -1,7 +1,7 @@
 import '@/assets/globals.css';
 
 import { Analytics } from '@vercel/analytics/react';
-import ConvexClientProvider from './ConvexClientProvider';
+import ConvexClientProvider from '@/components/ConvexClientProvider';
 import { Inter } from 'next/font/google';
 import type { Metadata } from 'next';
 import { ThemeProvider } from '@/components/theme-provider';

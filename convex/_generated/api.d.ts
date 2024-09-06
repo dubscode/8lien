@@ -17,8 +17,6 @@ import type * as crons from "../crons.js";
 import type * as genMonster from "../genMonster.js";
 import type * as images from "../images.js";
 import type * as monsters from "../monsters.js";
-import type * as posts from "../posts.js";
-import type * as shared from "../shared.js";
 import type * as tokenLogs from "../tokenLogs.js";
 import type * as users from "../users.js";
 
@@ -35,8 +33,6 @@ declare const fullApi: ApiFromModules<{
   genMonster: typeof genMonster;
   images: typeof images;
   monsters: typeof monsters;
-  posts: typeof posts;
-  shared: typeof shared;
   tokenLogs: typeof tokenLogs;
   users: typeof users;
 }>;

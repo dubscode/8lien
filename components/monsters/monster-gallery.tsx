@@ -18,16 +18,13 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination';
-import { useAction, useQuery } from 'convex/react';
-import { Button } from '@/components/ui/button';
+import { useQuery } from 'convex/react';
 import MonsterCard from '@/components/monsters/monster-card';
 import MonsterLeaderboard from '@/components/monsters/monster-leaderboard';
 import { api } from '@/convex/_generated/api';
 import { type CarouselApi } from '@/components/ui/carousel';
 
 export default function MonsterGallery() {
-  const [generatingMonster, setGeneratingMonster] = useState(false);
-  const genMonsterObject = useAction(api.genMonster.generateMonsterObject);
   const monsters = useQuery(api.monsters.all, {});
 
   const searchParams = useSearchParams();
@@ -65,12 +62,6 @@ export default function MonsterGallery() {
       };
     }
   }, [carouselApi, router]);
-
-  const handleGenerateMonster = async () => {
-    setGeneratingMonster(true);
-    await genMonsterObject();
-    setGeneratingMonster(false);
-  };
 
   const handlePaginationClick = (index: number) => {
     if (carouselApi) {
@@ -150,15 +141,6 @@ export default function MonsterGallery() {
 
   return (
     <div className='container mx-auto flex flex-col space-y-8 p-8'>
-      <div className='flex justify-center space-x-4'>
-        <Button
-          disabled={generatingMonster}
-          onClick={() => handleGenerateMonster()}
-        >
-          {generatingMonster ? 'Generating Monster...' : 'Generate Monster'}
-        </Button>
-      </div>
-
       <div className='flex flex-col md:flex-row md:space-x-8'>
         <div className='mb-8 w-full md:mb-0 md:w-1/3'>
           <MonsterLeaderboard />
@@ -178,8 +160,8 @@ export default function MonsterGallery() {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious />
-                <CarouselNext />
+                <CarouselPrevious variant='default' />
+                <CarouselNext variant='default' />
               </Carousel>
               <div className='mt-4 flex justify-center'>
                 <Pagination>
