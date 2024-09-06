@@ -23,6 +23,7 @@ import MonsterCard from '@/components/monsters/monster-card';
 import MonsterLeaderboard from '@/components/monsters/monster-leaderboard';
 import { api } from '@/convex/_generated/api';
 import { type CarouselApi } from '@/components/ui/carousel';
+import _ from 'lodash';
 
 export default function MonsterGallery() {
   const monsters = useQuery(api.monsters.all, {});
@@ -154,11 +155,13 @@ export default function MonsterGallery() {
                 className='mx-auto w-full max-w-2xl'
               >
                 <CarouselContent>
-                  {monsters.map((monster, index) => (
-                    <CarouselItem key={index}>
-                      <MonsterCard monster={monster} />
-                    </CarouselItem>
-                  ))}
+                  {_.orderBy(monsters, '_creationTime').map(
+                    (monster, index) => (
+                      <CarouselItem key={index}>
+                        <MonsterCard monster={monster} />
+                      </CarouselItem>
+                    )
+                  )}
                 </CarouselContent>
                 <CarouselPrevious variant='default' />
                 <CarouselNext variant='default' />

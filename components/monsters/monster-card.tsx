@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Doc } from '@/convex/_generated/dataModel';
@@ -13,6 +12,7 @@ import { api } from '@/convex/_generated/api';
 import monsterPlaceholder from '@/assets/monster-placeholder-loading.png';
 import { useAuth } from '@clerk/nextjs';
 import { useMutation } from 'convex/react';
+import { useState } from 'react';
 
 type MonsterCardProps = {
   monster: Doc<'monsters'>;
@@ -21,19 +21,9 @@ type MonsterCardProps = {
 export default function MonsterCard({ monster }: MonsterCardProps) {
   const { isSignedIn } = useAuth();
   const [showResearch, setShowResearch] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(monster.countdownTimer);
 
   const voteUp = useMutation(api.monsters.voteUp);
   const voteDown = useMutation(api.monsters.voteDown);
-
-  // useEffect(() => {
-  //   if (timeLeft > 0) {
-  //     const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-  //     return () => clearTimeout(timer);
-  //   } else {
-  //     setShowResearch(true);
-  //   }
-  // }, [timeLeft]);
 
   const handleVoteUp = () => {
     isSignedIn && voteUp({ id: monster._id });
@@ -76,7 +66,6 @@ export default function MonsterCard({ monster }: MonsterCardProps) {
         </Dialog>
 
         <div className='w-full text-center'>
-          <p className='mb-2 text-xl font-semibold'>Time Left: {timeLeft}s</p>
           {!isSignedIn ? (
             <p className='mb-2 text-sm font-semibold text-destructive'>
               You must be signed in to vote
