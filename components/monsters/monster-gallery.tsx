@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Carousel,
@@ -26,6 +26,8 @@ import { type CarouselApi } from '@/components/ui/carousel';
 import _ from 'lodash';
 
 export default function MonsterGallery() {
+  const monsterCount = useRef(20);
+
   const {
     results: monsters,
     status,
@@ -33,7 +35,7 @@ export default function MonsterGallery() {
   } = usePaginatedQuery(
     api.monsters.paginatedMonsters,
     {},
-    { initialNumItems: 50 }
+    { initialNumItems: 20 }
   );
 
   const searchParams = useSearchParams();
@@ -51,7 +53,14 @@ export default function MonsterGallery() {
   );
 
   useEffect(() => {
-    status === 'CanLoadMore' && loadMore(20);
+    if (
+      status === 'CanLoadMore' &&
+      monsterCount.current &&
+      monsterCount.current < 200
+    ) {
+      loadMore(20);
+      monsterCount.current = monsterCount.current + 20;
+    }
 
     const initializeCarousel = async () => {
       if (carouselApi && monsters) {
