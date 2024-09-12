@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   Carousel,
@@ -18,7 +18,7 @@ import {
   PaginationNext,
   PaginationPrevious
 } from '@/components/ui/pagination';
-import { usePaginatedQuery } from 'convex/react';
+import { useQuery } from 'convex/react';
 import MonsterCard from '@/components/monsters/monster-card';
 import MonsterLeaderboard from '@/components/monsters/monster-leaderboard';
 import { api } from '@/convex/_generated/api';
@@ -26,17 +26,7 @@ import { type CarouselApi } from '@/components/ui/carousel';
 import _ from 'lodash';
 
 export default function MonsterGallery() {
-  const monsterCount = useRef(20);
-
-  const {
-    results: monsters,
-    status,
-    loadMore
-  } = usePaginatedQuery(
-    api.monsters.paginatedMonsters,
-    {},
-    { initialNumItems: 20 }
-  );
+  const monsters = useQuery(api.monsters.top50monsters);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -53,22 +43,13 @@ export default function MonsterGallery() {
   );
 
   useEffect(() => {
-    if (
-      status === 'CanLoadMore' &&
-      monsterCount.current &&
-      monsterCount.current < 200
-    ) {
-      loadMore(20);
-      monsterCount.current = monsterCount.current + 20;
-    }
-
     const initializeCarousel = async () => {
       if (carouselApi && monsters) {
         let index = findMonsterIndex(requestedMonsterId);
-        if (index === -1 && status === 'CanLoadMore') {
-          console.log('Loading more and checking again');
+        if (index === -1) {
           index = 1;
-          // index = await loadMoreAndCheckAgain();
+          carouselApi.scrollTo(index, true);
+          setCurrentSlide(index);
         }
         if (index !== -1) {
           carouselApi.scrollTo(index, true);
@@ -82,7 +63,7 @@ export default function MonsterGallery() {
 
     initializeCarousel();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [carouselApi, monsters, requestedMonsterId, findMonsterIndex, status]);
+  }, [carouselApi, monsters, requestedMonsterId, findMonsterIndex]);
 
   useEffect(() => {
     if (carouselApi) {

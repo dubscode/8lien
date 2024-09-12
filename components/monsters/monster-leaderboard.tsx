@@ -17,7 +17,7 @@ export default function MonsterLeaderboard() {
       (a, b) =>
         b.safeVotes - b.dangerousVotes - (a.safeVotes - a.dangerousVotes)
     )
-    .slice(0, 20);
+    .slice(0, 10);
 
   const sortedByCreationDate = _.orderBy(monsters, '_creationTime');
 
