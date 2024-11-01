@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -66,4 +68,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.font-pixel {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }

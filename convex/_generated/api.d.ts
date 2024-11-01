@@ -14,10 +14,6 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as crons from "../crons.js";
-import type * as genMonster from "../genMonster.js";
-import type * as images from "../images.js";
-import type * as monsters from "../monsters.js";
-import type * as tokenLogs from "../tokenLogs.js";
 import type * as users from "../users.js";
 
 /**
@@ -30,10 +26,6 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   crons: typeof crons;
-  genMonster: typeof genMonster;
-  images: typeof images;
-  monsters: typeof monsters;
-  tokenLogs: typeof tokenLogs;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

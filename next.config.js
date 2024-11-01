@@ -9,6 +9,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'merry-kiwi-926.convex.cloud'
+      },
+      {
+        protocol: 'https',
+        hostname: '*blob.vercel-storage.com'
       }
     ]
   }
