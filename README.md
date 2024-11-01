@@ -1,19 +1,12 @@
-# Monster Research Incorporated
+# Alien: 8-bit Escape!
 
-![Monster Example](/assets/mirthful-zephyrkin.png?height=300&width=300)
+![Xenomorph](/assets/xenomorph.png?height=300&width=300)
 
-Monster Research Incorporated is a Next.js application that generates, displays, and ranks unique monsters using AI. This project was created as a submission for [LWJ Web Dev Challenge Hackathon 4: Monsters!](https://www.learnwithjason.dev/blog/web-dev-challenge-hackathon-monsters).
+Join the adventure in 8-bit Alien Escape, a thrilling multiplayer 2D game. Navigate through a space station maze, avoid face huggers and xenomorphs, and survive the challenges. Play as humans, androids, or aliens in this immersive web app built with Next.js and Convex backend. This project was created as a submission for [LWJ Web Dev Challenge Hackathon 7: Spooky Apps](https://www.learnwithjason.dev/blog/web-dev-challenge-s1e7-spooky-hackathon).
 
 ## Features
 
-- AI-powered monster generation using OpenAI's GPT and DALL-E
-- Real-time leaderboard and monster carousel
-- User authentication with Clerk
-- Backend powered by Convex, including database and file storage
-- Automatic monster generation every 5 minutes using Convex cron jobs
-- User voting system (authenticated users only)
-
-![Dashboard](/assets/dashboard.png?height=600&width=800)
+- Backend powered by Convex
 
 ## Tech Stack
 
@@ -22,10 +15,10 @@ Monster Research Incorporated is a Next.js application that generates, displays,
 - **Backend**: Convex
 - **AI Services**: OpenAI (GPT for text generation, DALL-E for image generation)
 - **Database**: Convex Database
-- **File Storage**: Convex Storage
-- **Scheduled Tasks**: Convex Cron Jobs
+- **File Storage**: Vercel Blob
+- **AI Assistant**: v0.dev
 
-## How It Works
+<!-- ## How It Works
 
 1. **Monster Generation**:
 
@@ -46,7 +39,7 @@ Monster Research Incorporated is a Next.js application that generates, displays,
 4. **User Interaction**:
    - Users must authenticate using Clerk to participate
    - Authenticated users can vote monsters up or down
-   - Votes affect the monster's position on the leaderboard
+   - Votes affect the monster's position on the leaderboard -->
 
 ## Getting Started
 
@@ -55,8 +48,8 @@ To run this project locally, follow these steps:
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/monster-research-inc.git
-   cd monster-research-inc
+   git clone https://github.com/dubscode/8lien.git
+   cd 8lien
    ```
 
 2. Install dependencies:
@@ -99,7 +92,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-- Thanks to the organizers of [LWJ Web Dev Challenge Hackathon 4: Monsters!](https://www.learnwithjason.dev/blog/web-dev-challenge-hackathon-monsters)
+- Thanks to the organizers of [LWJ Web Dev Challenge Hackathon 7: Spooky Apps](https://www.learnwithjason.dev/blog/web-dev-challenge-s1e7-spooky-hackathon)
 - Shoutout to the amazing APIs and services that made this project possible:
   - OpenAI
   - Clerk
@@ -112,6 +105,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Daniel Wise - [Portfolio](https://www.danwise.dev) - hi@danwise.dev
 
-Live Application: [https://monster-research.com](https://monster-research.com)
+Live Application: [https://8lien.app](https://8lien.app)
 
-Project Link: [https://github.com/dubscode/monster-research](https://github.com/dubscode/monster-research)
+Project Link: [https://github.com/dubscode/8lien](https://github.com/dubscode/8lien)
