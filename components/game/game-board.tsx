@@ -53,7 +53,7 @@ export function GameBoard() {
     setPlayerId(storedPlayerId);
   }, []);
 
-  const handleGameOver = useCallback(() => {
+  const handleGameOver = () => {
     setPlayerType('chestburster');
     setGameOver(true);
 
@@ -64,11 +64,9 @@ export function GameBoard() {
         gamesSurvived: survived
       });
     }
+  };
 
-    setPlayed((prev) => prev + 1);
-  }, [playerId, played, survived, updateUserScore]);
-
-  const handleGameWon = useCallback(() => {
+  const handleGameWon = () => {
     setGameWon(true);
 
     if (playerId) {
@@ -78,10 +76,7 @@ export function GameBoard() {
         gamesSurvived: survived + 1
       });
     }
-
-    setSurvived((prev) => prev + 1);
-    setPlayed((prev) => prev + 1);
-  }, [playerId, played, survived, updateUserScore]);
+  };
 
   const difficulty = useMemo(() => {
     if (survived < 3) return 'easy';
