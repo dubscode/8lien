@@ -1,11 +1,54 @@
 import { QueryCtx, mutation, query } from './_generated/server';
 
-import { faker } from '@faker-js/faker';
 import { v } from 'convex/values';
 
-const generateName = () => {
-  return `${faker.science.chemicalElement().name}  ${faker.person.lastName()}`;
-};
+function generateSciFiName() {
+  const prefixes = [
+    'Zorp',
+    'Blarg',
+    'Quix',
+    'Flob',
+    'Glip',
+    'Zax',
+    'Vex',
+    'Nyx',
+    'Krang',
+    'Zorp'
+  ];
+  const suffixes = [
+    'oid',
+    'ax',
+    'on',
+    'ium',
+    'ator',
+    'tron',
+    'bot',
+    'zoid',
+    'nar',
+    'gle'
+  ];
+  const titles = [
+    'Captain',
+    'Admiral',
+    'Commander',
+    'Ensign',
+    'Doctor',
+    'Professor',
+    'Overlord',
+    'Technician',
+    'Janitor',
+    'Cook'
+  ];
+
+  const getRandomElement = (array: string[]) =>
+    array[Math.floor(Math.random() * array.length)];
+
+  const prefix = getRandomElement(prefixes);
+  const suffix = getRandomElement(suffixes);
+  const title = getRandomElement(titles);
+
+  return `${title} ${prefix}${suffix}`;
+}
 
 export const getPlayer = query({
   args: {
@@ -51,11 +94,11 @@ export const updateScore = mutation(
       await db.patch(existingPlayer._id, {
         gamesPlayed,
         gamesSurvived,
-        name: existingName || generateName()
+        name: existingName || generateSciFiName()
       });
     } else {
       // Create a new user record
-      const name = generateName();
+      const name = generateSciFiName();
 
       await db.insert('players', {
         playerId,
