@@ -4,6 +4,7 @@ export type CharacterType =
   | 'chestburster'
   | 'facehugger'
   | 'man'
+  | 'mostly'
   | 'spacesuit'
   | 'woman'
   | 'xenomorph';
@@ -22,5 +23,6 @@ export interface Position {
 export interface NPC {
   id: number;
   position: Position;
+  previousMove?: string;
   type: 'facehugger' | 'xenomorph';
 }

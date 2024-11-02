@@ -1,13 +1,7 @@
 'use client';
 
-import { CELL_SIZE, GRID_SIZE, generateMaze, sprites } from '@/lib/game';
-import {
-  CellType,
-  CharacterType,
-  Difficulty,
-  NPC,
-  Position
-} from '@/lib/types';
+import { CellType, CharacterType, NPC, Position } from '@/lib/types';
+import { GRID_SIZE, generateMaze, sprites } from '@/lib/game';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { CharacterSelect } from './character-select';
@@ -22,21 +16,17 @@ export function GameBoard() {
     y: 1
   });
   const [playerType, setPlayerType] = useState<CharacterType>('woman');
-
   const [maze, setMaze] = useState<CellType[][]>(initialMaze);
   const [npcs, setNpcs] = useState<NPC[]>([]);
   const [survived, setSurvived] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+  const [cellSize, setCellSize] = useState(40);
 
   const difficulty = useMemo(() => {
-    if (survived < 3) {
-      return 'easy';
-    } else if (survived < 6) {
-      return 'medium';
-    } else {
-      return 'hard';
-    }
+    if (survived < 3) return 'easy';
+    else if (survived < 6) return 'medium';
+    else return 'hard';
   }, [survived]);
 
   const npcSpeed = useMemo(() => {
@@ -56,34 +46,45 @@ export function GameBoard() {
     setPlayerPosition({ x: 1, y: 1 });
     setPlayerType('woman');
 
-    // Find valid positions for NPCs
-    const validPositions = [];
-    for (let y = 0; y < GRID_SIZE; y++) {
-      for (let x = 0; x < GRID_SIZE; x++) {
-        if (newMaze[y][x] === 'empty' && (x !== 1 || y !== 1)) {
-          validPositions.push({ x, y });
-        }
-      }
-    }
-    // Helper function to pop a random value from an array
-    function popRandom<T>(array: T[]): T | undefined {
-      const index = Math.floor(Math.random() * array.length);
-      return array.splice(index, 1)[0];
-    }
-    // Randomly place NPCs
-    const newNpcs = [
-      { id: 1, position: popRandom(validPositions), type: 'facehugger' },
-      { id: 2, position: popRandom(validPositions), type: 'xenomorph' }
-    ].filter((npc) => npc.position); // Remove any NPCs that couldn't be placed
+    const validPositions = newMaze
+      .flatMap((row, y) =>
+        row.map((cell, x) =>
+          cell === 'empty' && (x !== 1 || y !== 1) ? { x, y } : null
+        )
+      )
+      .filter(Boolean);
+
+    const newNpcs = ['facehugger', 'xenomorph']
+      .map((type, id) => ({
+        id,
+        position: validPositions.splice(
+          Math.floor(Math.random() * validPositions.length),
+          1
+        )[0],
+        type
+      }))
+      .filter((npc) => npc.position);
 
     setNpcs(newNpcs as NPC[]);
     setGameOver(false);
     setGameWon(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [difficulty]);
 
   useEffect(() => {
     initializeGame();
+
+    const handleResize = () => {
+      const containerWidth = window.innerWidth - 32; // 32px for padding
+      const containerHeight = window.innerHeight - 200; // Reserve space for title and instructions
+      const newCellSize = Math.floor(
+        Math.min(containerWidth, containerHeight) / GRID_SIZE
+      );
+      setCellSize(newCellSize);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [initializeGame]);
 
   const moveNpcs = useCallback(() => {
@@ -124,7 +125,7 @@ export function GameBoard() {
   }, [maze]);
 
   useEffect(() => {
-    const npcMoveInterval = setInterval(moveNpcs, npcSpeed); // Move NPCs interval
+    const npcMoveInterval = setInterval(moveNpcs, npcSpeed);
     return () => clearInterval(npcMoveInterval);
   }, [moveNpcs, npcSpeed]);
 
@@ -133,7 +134,6 @@ export function GameBoard() {
       if (gameOver) return;
 
       const newPosition = { ...playerPosition };
-
       switch (e.key) {
         case 'ArrowUp':
           newPosition.y = Math.max(0, playerPosition.y - 1);
@@ -162,7 +162,6 @@ export function GameBoard() {
   }, [playerPosition, maze, gameOver]);
 
   useEffect(() => {
-    // Check for collisions with NPCs
     const collidingNpc = npcs.find(
       (npc) =>
         npc.position.x === playerPosition.x &&
@@ -175,82 +174,83 @@ export function GameBoard() {
   }, [playerPosition, npcs]);
 
   return (
-    <div className='flex h-full w-full flex-col items-center justify-center bg-black text-white'>
-      <h1 className='font-pixel mb-4 text-4xl font-bold'>
+    <div className='flex h-screen w-full flex-col items-center justify-between bg-black p-4 text-white'>
+      <h1 className='font-pixel mb-4 text-2xl font-bold sm:text-3xl md:text-4xl'>
         Alien: 8-bit Escape
       </h1>
-      {gameOver ? (
-        <GameOver initializeGame={initializeGame} setSurvived={setSurvived} />
-      ) : gameWon ? (
-        <GameWon initializeGame={initializeGame} setSurvived={setSurvived} />
-      ) : (
-        <div
-          className='grid border-4 border-gray-700 bg-gray-900 p-2'
-          style={{
-            gridTemplateColumns: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)`,
-            gridTemplateRows: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)`
-          }}
-        >
-          {maze.map((row, y) =>
-            row.map((cell, x) => {
-              const isPlayer = x === playerPosition.x && y === playerPosition.y;
-              const npc = npcs.find(
-                (npc) => npc.position.x === x && npc.position.y === y
-              );
-              const airlock = x === GRID_SIZE - 2 && y === GRID_SIZE - 2;
-              return (
-                <div
-                  key={`${x}-${y}`}
-                  className={`relative ${cell === 'wall' ? 'bg-gray-700' : 'bg-gray-900'} ${
-                    isPlayer ? 'bg-gray-800/50' : ''
-                  } `}
-                >
-                  {isPlayer && (
-                    <Image
-                      src={sprites[playerType]}
-                      alt={playerType}
-                      width={CELL_SIZE}
-                      height={CELL_SIZE}
-                      className='pixel-art absolute left-0 top-0 h-full w-full object-contain'
-                      priority
-                    />
-                  )}
-                  {npc && (
-                    <Image
-                      src={sprites[npc.type]}
-                      alt={npc.type}
-                      width={CELL_SIZE}
-                      height={CELL_SIZE}
-                      className='pixel-art absolute left-0 top-0 h-full w-full object-contain'
-                      priority
-                    />
-                  )}
-                  {airlock && (
-                    <Image
-                      src={sprites['airlock']}
-                      alt={'airlock'}
-                      width={CELL_SIZE}
-                      height={CELL_SIZE}
-                      className='pixel-art absolute left-0 top-0 h-full w-full object-contain'
-                      priority
-                    />
-                  )}
-                </div>
-              );
-            })
-          )}
-        </div>
-      )}
+      <div className='flex max-h-full w-full max-w-full flex-1 items-center justify-center overflow-auto'>
+        {gameOver ? (
+          <GameOver initializeGame={initializeGame} setSurvived={setSurvived} />
+        ) : gameWon ? (
+          <GameWon initializeGame={initializeGame} setSurvived={setSurvived} />
+        ) : (
+          <div
+            className='grid border-4 border-gray-700 bg-gray-900 p-2'
+            style={{
+              gridTemplateColumns: `repeat(${GRID_SIZE}, ${cellSize}px)`,
+              gridTemplateRows: `repeat(${GRID_SIZE}, ${cellSize}px)`
+            }}
+          >
+            {maze.map((row, y) =>
+              row.map((cell, x) => {
+                const isPlayer =
+                  x === playerPosition.x && y === playerPosition.y;
+                const npc = npcs.find(
+                  (npc) => npc.position.x === x && npc.position.y === y
+                );
+                const airlock = x === GRID_SIZE - 2 && y === GRID_SIZE - 2;
+                return (
+                  <div
+                    key={`${x}-${y}`}
+                    className={`relative ${cell === 'wall' ? 'bg-gray-700' : 'bg-gray-900'} ${isPlayer ? 'bg-gray-800/50' : ''}`}
+                  >
+                    {isPlayer && (
+                      <Image
+                        src={sprites[playerType]}
+                        alt={playerType}
+                        width={cellSize}
+                        height={cellSize}
+                        className='pixel-art absolute left-0 top-0 h-full w-full object-contain'
+                        priority
+                      />
+                    )}
+                    {npc && (
+                      <Image
+                        src={sprites[npc.type]}
+                        alt={npc.type}
+                        width={cellSize}
+                        height={cellSize}
+                        className='pixel-art absolute left-0 top-0 h-full w-full object-contain'
+                        priority
+                      />
+                    )}
+                    {airlock && (
+                      <Image
+                        src={sprites['airlock']}
+                        alt={'airlock'}
+                        width={cellSize}
+                        height={cellSize}
+                        className='pixel-art absolute left-0 top-0 h-full w-full object-contain'
+                        priority
+                      />
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
+      </div>
       {!gameOver && !gameWon && (
-        <>
+        <div className='mt-4'>
           <CharacterSelect
             playerType={playerType}
             setPlayerType={setPlayerType}
           />
-          <p className='font-pixel mt-4 text-sm'>
+          <p className='font-pixel mt-2 text-center text-xs sm:text-sm'>
             Use arrow keys to move. Difficulty: {difficulty}
           </p>
-        </>
+        </div>
       )}
     </div>
   );

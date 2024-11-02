@@ -12,6 +12,7 @@ export const sprites: Sprites = {
   facehugger:
     'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/facehugger.png',
   man: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/marine2.webp',
+  mostly: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/mostly.png',
   spacesuit:
     'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/astronaut.png',
   woman: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/woman.png',

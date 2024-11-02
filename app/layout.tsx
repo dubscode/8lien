@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${inter.className} ${pressStart2P.variable} flex min-h-screen flex-col`}
+        className={`${inter.className} ${pressStart2P.variable} flex flex-col bg-black text-white`}
       >
         <ConvexClientProvider>
           <ClerkProvider
