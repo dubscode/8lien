@@ -8,7 +8,7 @@ import {
   NPC,
   Position
 } from '@/lib/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { CharacterSelect } from './character-select';
 import { GameOver } from './game-over';
@@ -22,11 +22,33 @@ export function GameBoard() {
     y: 1
   });
   const [playerType, setPlayerType] = useState<CharacterType>('woman');
-  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+
   const [maze, setMaze] = useState<CellType[][]>(initialMaze);
   const [npcs, setNpcs] = useState<NPC[]>([]);
+  const [survived, setSurvived] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
+
+  const difficulty = useMemo(() => {
+    if (survived < 3) {
+      return 'easy';
+    } else if (survived < 6) {
+      return 'medium';
+    } else {
+      return 'hard';
+    }
+  }, [survived]);
+
+  const npcSpeed = useMemo(() => {
+    switch (difficulty) {
+      case 'easy':
+        return 1000;
+      case 'medium':
+        return 800;
+      case 'hard':
+        return 600;
+    }
+  }, [difficulty]);
 
   const initializeGame = useCallback(() => {
     const newMaze = generateMaze(GRID_SIZE, difficulty);
@@ -102,9 +124,9 @@ export function GameBoard() {
   }, [maze]);
 
   useEffect(() => {
-    const npcMoveInterval = setInterval(moveNpcs, 1000); // Move NPCs every second
+    const npcMoveInterval = setInterval(moveNpcs, npcSpeed); // Move NPCs interval
     return () => clearInterval(npcMoveInterval);
-  }, [moveNpcs]);
+  }, [moveNpcs, npcSpeed]);
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -158,9 +180,9 @@ export function GameBoard() {
         Alien: 8-bit Escape
       </h1>
       {gameOver ? (
-        <GameOver initializeGame={initializeGame} />
+        <GameOver initializeGame={initializeGame} setSurvived={setSurvived} />
       ) : gameWon ? (
-        <GameWon initializeGame={initializeGame} />
+        <GameWon initializeGame={initializeGame} setSurvived={setSurvived} />
       ) : (
         <div
           className='grid border-4 border-gray-700 bg-gray-900 p-2'
@@ -225,7 +247,9 @@ export function GameBoard() {
             playerType={playerType}
             setPlayerType={setPlayerType}
           />
-          <p className='font-pixel mt-4 text-sm'>Use arrow keys to move</p>
+          <p className='font-pixel mt-4 text-sm'>
+            Use arrow keys to move. Difficulty: {difficulty}
+          </p>
         </>
       )}
     </div>

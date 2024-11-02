@@ -1,16 +1,23 @@
+import { Dispatch, SetStateAction, useEffect } from 'react';
+
 import Image from 'next/image';
 import { sprites } from '@/lib/game';
-import { useEffect } from 'react';
 
 type GameOverProps = {
   initializeGame: () => void;
+  setSurvived: Dispatch<SetStateAction<number>>;
 };
 
-export function GameOver({ initializeGame }: GameOverProps) {
+export function GameOver({ initializeGame, setSurvived }: GameOverProps) {
+  const handleInitializeGame = () => {
+    setSurvived((prev) => (prev > 0 ? prev - 1 : 0));
+    initializeGame();
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
-        initializeGame();
+        handleInitializeGame();
       }
     };
 
@@ -36,7 +43,7 @@ export function GameOver({ initializeGame }: GameOverProps) {
           You have been caught and turned into a chestburster!
         </p>
         <button
-          onClick={initializeGame}
+          onClick={handleInitializeGame}
           className='font-pixel focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none'
           aria-label='Play Again'
         >

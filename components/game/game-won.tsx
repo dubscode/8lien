@@ -1,16 +1,23 @@
+import { Dispatch, SetStateAction, useEffect } from 'react';
+
 import Image from 'next/image';
 import { sprites } from '@/lib/game';
-import { useEffect } from 'react';
 
 type GameWonProps = {
   initializeGame: () => void;
+  setSurvived: Dispatch<SetStateAction<number>>;
 };
 
-export function GameWon({ initializeGame }: GameWonProps) {
+export function GameWon({ initializeGame, setSurvived }: GameWonProps) {
+  const handleInitializeGame = () => {
+    setSurvived((prev) => prev + 1);
+    initializeGame();
+  };
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Enter') {
-        initializeGame();
+        handleInitializeGame();
       }
     };
 
@@ -36,7 +43,7 @@ export function GameWon({ initializeGame }: GameWonProps) {
           You have successfully blasted the alien through the airlock!
         </p>
         <button
-          onClick={initializeGame}
+          onClick={handleInitializeGame}
           className='font-pixel focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none'
           aria-label='Play Again'
         >
