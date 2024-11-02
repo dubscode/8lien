@@ -187,6 +187,14 @@ export function GameBoard() {
         gamesSurvived={survived}
       />
       <div className='flex max-h-full w-full max-w-full flex-1 items-center justify-center overflow-auto'>
+        {!gameOver && !gameWon && (
+          <div className='mt-1'>
+            <CharacterSelect
+              playerType={playerType}
+              setPlayerType={setPlayerType}
+            />
+          </div>
+        )}
         {gameOver ? (
           <GameOver initializeGame={initializeGame} setPlayed={setPlayed} />
         ) : gameWon ? (
@@ -254,13 +262,9 @@ export function GameBoard() {
         )}
       </div>
       {!gameOver && !gameWon && (
-        <div className='mt-1'>
-          <CharacterSelect
-            playerType={playerType}
-            setPlayerType={setPlayerType}
-          />
-          <p className='font-pixel mt-2 text-center text-xs sm:text-sm'>
-            Use arrow keys to move. Difficulty: {difficulty}
+        <div className='flex flex-col'>
+          <p className='font-pixel text-center text-xs sm:text-sm'>
+            Use arrow keys to move.
           </p>
         </div>
       )}
