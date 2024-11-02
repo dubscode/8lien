@@ -79,19 +79,21 @@ export function GameBoard() {
   };
 
   const difficulty = useMemo(() => {
-    if (survived < 3) return 'easy';
-    else if (survived < 6) return 'medium';
+    const survivalRate = played < 1 ? 0 : survived / played;
+
+    if (survivalRate < 0.33) return 'easy';
+    else if (survivalRate < 0.66) return 'medium';
     else return 'hard';
-  }, [survived]);
+  }, [survived, played]);
 
   const npcSpeed = useMemo(() => {
     switch (difficulty) {
       case 'easy':
         return 1000;
       case 'medium':
-        return 800;
+        return 700;
       case 'hard':
-        return 600;
+        return 500;
     }
   }, [difficulty]);
 
@@ -109,7 +111,11 @@ export function GameBoard() {
       )
       .filter(Boolean);
 
-    const newNpcs = ['facehugger', 'xenomorph']
+    const npcCount =
+      difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
+
+    const newNpcs = ['facehugger', 'xenomorph', 'chestburster', 'android']
+      .slice(0, npcCount)
       .map((type, id) => ({
         id,
         position: validPositions.splice(
