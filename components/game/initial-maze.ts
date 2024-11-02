@@ -1,4 +1,4 @@
-import { CellType } from '@/components/game/game-board';
+import { CellType } from '@/lib/types';
 
 export const initialMaze: CellType[][] = [
   [

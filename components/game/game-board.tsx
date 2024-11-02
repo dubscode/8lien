@@ -1,48 +1,20 @@
 'use client';
 
+import { CELL_SIZE, GRID_SIZE, generateMaze, sprites } from '@/lib/game';
+import {
+  CellType,
+  CharacterType,
+  Difficulty,
+  NPC,
+  Position
+} from '@/lib/types';
 import { useCallback, useEffect, useState } from 'react';
 
+import { CharacterSelect } from './character-select';
+import { GameOver } from './game-over';
+import { GameWon } from './game-won';
 import Image from 'next/image';
 import { initialMaze } from '@/components/game/initial-maze';
-
-const GRID_SIZE = 20;
-const CELL_SIZE = 40; // Increased for better sprite visibility
-
-type CharacterType =
-  | 'android'
-  | 'chestburster'
-  | 'facehugger'
-  | 'man'
-  | 'spacesuit'
-  | 'woman'
-  | 'xenomorph';
-
-export type CellType = 'empty' | 'wall' | 'player' | 'npc';
-
-interface Position {
-  x: number;
-  y: number;
-}
-
-interface NPC {
-  id: number;
-  position: Position;
-  type: 'facehugger' | 'xenomorph';
-}
-
-const sprites = {
-  android: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/droid.png',
-  chestburster:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/chestburster.png',
-  facehugger:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/facehugger.png',
-  man: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/man.png',
-  spacesuit:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/astronaut.png',
-  woman: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/woman.png',
-  xenomorph:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/xenomorph.png'
-};
 
 export function GameBoard() {
   const [playerPosition, setPlayerPosition] = useState<Position>({
@@ -50,19 +22,42 @@ export function GameBoard() {
     y: 1
   });
   const [playerType, setPlayerType] = useState<CharacterType>('woman');
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [maze, setMaze] = useState<CellType[][]>(initialMaze);
   const [npcs, setNpcs] = useState<NPC[]>([]);
   const [gameOver, setGameOver] = useState(false);
+  const [gameWon, setGameWon] = useState(false);
 
   const initializeGame = useCallback(() => {
+    const newMaze = generateMaze(GRID_SIZE, difficulty);
+    setMaze(newMaze);
     setPlayerPosition({ x: 1, y: 1 });
     setPlayerType('woman');
-    setMaze(initialMaze);
-    setNpcs([
-      { id: 1, position: { x: 18, y: 18 }, type: 'facehugger' },
-      { id: 2, position: { x: 18, y: 1 }, type: 'xenomorph' }
-    ]);
+
+    // Find valid positions for NPCs
+    const validPositions = [];
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        if (newMaze[y][x] === 'empty' && (x !== 1 || y !== 1)) {
+          validPositions.push({ x, y });
+        }
+      }
+    }
+    // Helper function to pop a random value from an array
+    function popRandom<T>(array: T[]): T | undefined {
+      const index = Math.floor(Math.random() * array.length);
+      return array.splice(index, 1)[0];
+    }
+    // Randomly place NPCs
+    const newNpcs = [
+      { id: 1, position: popRandom(validPositions), type: 'facehugger' },
+      { id: 2, position: popRandom(validPositions), type: 'xenomorph' }
+    ].filter((npc) => npc.position); // Remove any NPCs that couldn't be placed
+
+    setNpcs(newNpcs as NPC[]);
     setGameOver(false);
+    setGameWon(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -134,6 +129,9 @@ export function GameBoard() {
 
       if (maze[newPosition.y][newPosition.x] !== 'wall') {
         setPlayerPosition(newPosition);
+        if (maze[newPosition.y][newPosition.x] === 'airlock') {
+          setGameWon(true);
+        }
       }
     };
 
@@ -160,28 +158,9 @@ export function GameBoard() {
         Alien: 8-bit Escape
       </h1>
       {gameOver ? (
-        <div className='relative aspect-square w-full max-w-md'>
-          <Image
-            src={sprites.chestburster}
-            alt='Chestburster'
-            layout='fill'
-            objectFit='contain'
-            className='opacity-20'
-          />
-          <div className='absolute inset-0 flex flex-col items-center justify-center text-center'>
-            <h2 className='font-pixel mb-4 text-4xl'>Game Over Man!</h2>
-            <p className='mb-4'>
-              You have been caught and turned into a chestburster!
-            </p>
-            <button
-              onClick={initializeGame}
-              className='font-pixel focus:shadow-outline rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700 focus:outline-none'
-              aria-label='Play Again'
-            >
-              Play Again
-            </button>
-          </div>
-        </div>
+        <GameOver initializeGame={initializeGame} />
+      ) : gameWon ? (
+        <GameWon initializeGame={initializeGame} />
       ) : (
         <div
           className='grid border-4 border-gray-700 bg-gray-900 p-2'
@@ -196,6 +175,7 @@ export function GameBoard() {
               const npc = npcs.find(
                 (npc) => npc.position.x === x && npc.position.y === y
               );
+              const airlock = x === GRID_SIZE - 2 && y === GRID_SIZE - 2;
               return (
                 <div
                   key={`${x}-${y}`}
@@ -223,40 +203,28 @@ export function GameBoard() {
                       priority
                     />
                   )}
+                  {airlock && (
+                    <Image
+                      src={sprites['airlock']}
+                      alt={'airlock'}
+                      width={CELL_SIZE}
+                      height={CELL_SIZE}
+                      className='pixel-art absolute left-0 top-0 h-full w-full object-contain'
+                      priority
+                    />
+                  )}
                 </div>
               );
             })
           )}
         </div>
       )}
-      {!gameOver && (
+      {!gameOver && !gameWon && (
         <>
-          <div className='mt-4 space-x-2'>
-            <button
-              onClick={() => setPlayerType('woman')}
-              className={`font-pixel rounded px-3 py-1 text-sm ${
-                playerType === 'woman' ? 'bg-blue-500' : 'bg-gray-700'
-              }`}
-            >
-              Woman
-            </button>
-            <button
-              onClick={() => setPlayerType('android')}
-              className={`font-pixel rounded px-3 py-1 text-sm ${
-                playerType === 'android' ? 'bg-blue-500' : 'bg-gray-700'
-              }`}
-            >
-              Android
-            </button>
-            <button
-              onClick={() => setPlayerType('xenomorph')}
-              className={`font-pixel rounded px-3 py-1 text-sm ${
-                playerType === 'xenomorph' ? 'bg-blue-500' : 'bg-gray-700'
-              }`}
-            >
-              Xenomorph
-            </button>
-          </div>
+          <CharacterSelect
+            playerType={playerType}
+            setPlayerType={setPlayerType}
+          />
           <p className='font-pixel mt-4 text-sm'>Use arrow keys to move</p>
         </>
       )}
