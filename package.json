@@ -15,6 +15,7 @@
     "@ai-sdk/openai": "^0.0.55",
     "@clerk/clerk-react": "^4.30.3",
     "@clerk/nextjs": "^5.4.1",
+    "@faker-js/faker": "^9.1.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -53,6 +54,7 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.3.3",
     "ulid": "^2.3.0",
+    "uuid": "^11.0.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {

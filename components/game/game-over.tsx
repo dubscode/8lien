@@ -5,12 +5,10 @@ import { sprites } from '@/lib/game';
 
 type GameOverProps = {
   initializeGame: () => void;
-  setPlayed: Dispatch<SetStateAction<number>>;
 };
 
-export function GameOver({ initializeGame, setPlayed }: GameOverProps) {
+export function GameOver({ initializeGame }: GameOverProps) {
   const handleInitializeGame = () => {
-    setPlayed((prev) => prev + 1);
     initializeGame();
   };
 

@@ -3,13 +3,16 @@
 import { CellType, CharacterType, NPC, Position } from '@/lib/types';
 import { GRID_SIZE, generateMaze, sprites } from '@/lib/game';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMutation, useQuery } from 'convex/react';
 
 import { CharacterSelect } from './character-select';
 import { GameOver } from './game-over';
 import { GameWon } from './game-won';
 import Image from 'next/image';
 import { Scoreboard } from '@/components/game/scoreboard';
+import { api } from '@/convex/_generated/api';
 import { initialMaze } from '@/components/game/initial-maze';
+import { v4 as uuidv4 } from 'uuid';
 
 export function GameBoard() {
   const [playerPosition, setPlayerPosition] = useState<Position>({
@@ -24,6 +27,61 @@ export function GameBoard() {
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
   const [cellSize, setCellSize] = useState(40);
+  const [playerId, setPlayerId] = useState<string | null>(null);
+
+  const player = useQuery(api.players.getPlayer, { playerId });
+
+  useEffect(() => {
+    if (player) {
+      setPlayed(player.gamesPlayed);
+      setSurvived(player.gamesSurvived);
+    } else {
+      setPlayed(0);
+      setSurvived(0);
+    }
+  }, [player]);
+
+  const updateUserScore = useMutation(api.players.updateScore);
+
+  useEffect(() => {
+    // Get or create player ID
+    let storedPlayerId = localStorage.getItem('alienGamePlayerId');
+    if (!storedPlayerId) {
+      storedPlayerId = uuidv4();
+      localStorage.setItem('alienGamePlayerId', storedPlayerId);
+    }
+    setPlayerId(storedPlayerId);
+  }, []);
+
+  const handleGameOver = useCallback(() => {
+    setPlayerType('chestburster');
+    setGameOver(true);
+
+    if (playerId) {
+      updateUserScore({
+        playerId,
+        gamesPlayed: played + 1,
+        gamesSurvived: survived
+      });
+    }
+
+    setPlayed((prev) => prev + 1);
+  }, [playerId, played, survived, updateUserScore]);
+
+  const handleGameWon = useCallback(() => {
+    setGameWon(true);
+
+    if (playerId) {
+      updateUserScore({
+        playerId,
+        gamesPlayed: played + 1,
+        gamesSurvived: survived + 1
+      });
+    }
+
+    setSurvived((prev) => prev + 1);
+    setPlayed((prev) => prev + 1);
+  }, [playerId, played, survived, updateUserScore]);
 
   const difficulty = useMemo(() => {
     if (survived < 3) return 'easy';
@@ -154,13 +212,14 @@ export function GameBoard() {
       if (maze[newPosition.y][newPosition.x] !== 'wall') {
         setPlayerPosition(newPosition);
         if (maze[newPosition.y][newPosition.x] === 'airlock') {
-          setGameWon(true);
+          handleGameWon();
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerPosition, maze, gameOver]);
 
   useEffect(() => {
@@ -170,9 +229,9 @@ export function GameBoard() {
         npc.position.y === playerPosition.y
     );
     if (collidingNpc) {
-      setGameOver(true);
-      setPlayerType('chestburster');
+      handleGameOver();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerPosition, npcs]);
 
   return (
@@ -196,13 +255,9 @@ export function GameBoard() {
           </div>
         )}
         {gameOver ? (
-          <GameOver initializeGame={initializeGame} setPlayed={setPlayed} />
+          <GameOver initializeGame={initializeGame} />
         ) : gameWon ? (
-          <GameWon
-            initializeGame={initializeGame}
-            setPlayed={setPlayed}
-            setSurvived={setSurvived}
-          />
+          <GameWon initializeGame={initializeGame} />
         ) : (
           <div
             className='grid border-4 border-gray-700 bg-gray-900 p-2'

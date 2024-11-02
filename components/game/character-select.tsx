@@ -26,31 +26,34 @@ export function CharacterSelect({
 
   return (
     <div
-      className={`${pressStart2P.className} flex w-28 flex-col gap-2 rounded-lg bg-gray-800 p-2`}
+      className={`${pressStart2P.className} flex w-12 flex-col items-center`}
     >
-      <h2 className='mb-2 text-center text-xs text-white'>Select Character</h2>
-      {characters.map((character) => (
-        <button
-          key={character.type}
-          onClick={() => setPlayerType(character.type)}
-          className={`flex w-full flex-col items-center rounded p-2 transition-colors ${
-            playerType === character.type
-              ? 'bg-blue-500'
-              : 'bg-gray-700 hover:bg-gray-600'
-          }`}
-        >
-          <div className='relative size-10 overflow-hidden rounded'>
-            <Image
-              src={sprites[character.type]}
-              alt={`${character.name} character`}
-              layout='fill'
-              objectFit='contain'
-              className='pixel-art'
-            />
-          </div>
-          <span className='mt-2 text-xs text-white'>{character.name}</span>
-        </button>
-      ))}
+      <h2 className='mb-1 text-center text-[8px] text-white'>Select</h2>
+      <div className='flex flex-col gap-1 rounded-md bg-gray-800 p-1'>
+        {characters.map((character) => (
+          <button
+            key={character.type}
+            onClick={() => setPlayerType(character.type)}
+            className={`flex flex-col items-center rounded p-1 transition-colors ${
+              playerType === character.type
+                ? 'bg-blue-500'
+                : 'bg-gray-700 hover:bg-gray-600'
+            }`}
+            title={character.name}
+          >
+            <div className='relative size-6 overflow-hidden rounded'>
+              <Image
+                src={sprites[character.type]}
+                alt={`${character.name} character`}
+                fill
+                sizes='(max-width: 768px) 24px, 24px'
+                className='pixel-art object-contain'
+                priority
+              />
+            </div>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
