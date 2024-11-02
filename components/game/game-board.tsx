@@ -5,6 +5,7 @@ import { GRID_SIZE, generateMaze, sprites } from '@/lib/game';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
 
+import { ArcadeButton } from './arcade-button';
 import { CharacterSelect } from './character-select';
 import { GameOver } from './game-over';
 import { GameWon } from './game-won';
@@ -75,6 +76,20 @@ export function GameBoard() {
         gamesPlayed: played + 1,
         gamesSurvived: survived + 1
       });
+    }
+  };
+
+  const handleResetScores = () => {
+    if (playerId) {
+      if (confirm('Are you sure you want to reset the scores?')) {
+        updateUserScore({
+          playerId,
+          gamesPlayed: 0,
+          gamesSurvived: 0
+        });
+        setPlayed(0);
+        setSurvived(0);
+      }
     }
   };
 
@@ -240,12 +255,20 @@ export function GameBoard() {
       <h1 className='font-pixel mb-4 text-2xl font-bold sm:text-3xl md:text-4xl'>
         Alien: 8-bit Escape
       </h1>
-      <Scoreboard
-        cellSize={cellSize}
-        difficulty={difficulty}
-        gamesPlayed={played}
-        gamesSurvived={survived}
-      />
+
+      <div className='flex w-full items-center justify-center gap-2'>
+        <Scoreboard
+          cellSize={cellSize}
+          difficulty={difficulty}
+          gamesPlayed={played}
+          gamesSurvived={survived}
+        />
+        <ArcadeButton
+          className='size-10'
+          text='R'
+          onClick={() => handleResetScores()}
+        />
+      </div>
       <div className='flex max-h-full w-full max-w-full flex-1 items-center justify-center overflow-auto'>
         {!gameOver && !gameWon && (
           <div className='mt-1'>
