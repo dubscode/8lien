@@ -5,12 +5,18 @@ import { sprites } from '@/lib/game';
 
 type GameWonProps = {
   initializeGame: () => void;
+  setPlayed: Dispatch<SetStateAction<number>>;
   setSurvived: Dispatch<SetStateAction<number>>;
 };
 
-export function GameWon({ initializeGame, setSurvived }: GameWonProps) {
+export function GameWon({
+  initializeGame,
+  setPlayed,
+  setSurvived
+}: GameWonProps) {
   const handleInitializeGame = () => {
     setSurvived((prev) => prev + 1);
+    setPlayed((prev) => prev + 1);
     initializeGame();
   };
 

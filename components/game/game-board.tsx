@@ -8,6 +8,7 @@ import { CharacterSelect } from './character-select';
 import { GameOver } from './game-over';
 import { GameWon } from './game-won';
 import Image from 'next/image';
+import { Scoreboard } from '@/components/game/scoreboard';
 import { initialMaze } from '@/components/game/initial-maze';
 
 export function GameBoard() {
@@ -18,6 +19,7 @@ export function GameBoard() {
   const [playerType, setPlayerType] = useState<CharacterType>('woman');
   const [maze, setMaze] = useState<CellType[][]>(initialMaze);
   const [npcs, setNpcs] = useState<NPC[]>([]);
+  const [played, setPlayed] = useState(0);
   const [survived, setSurvived] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [gameWon, setGameWon] = useState(false);
@@ -75,7 +77,7 @@ export function GameBoard() {
 
     const handleResize = () => {
       const containerWidth = window.innerWidth - 32; // 32px for padding
-      const containerHeight = window.innerHeight - 200; // Reserve space for title and instructions
+      const containerHeight = window.innerHeight - 275; // Reserve space for title and instructions
       const newCellSize = Math.floor(
         Math.min(containerWidth, containerHeight) / GRID_SIZE
       );
@@ -178,11 +180,21 @@ export function GameBoard() {
       <h1 className='font-pixel mb-4 text-2xl font-bold sm:text-3xl md:text-4xl'>
         Alien: 8-bit Escape
       </h1>
+      <Scoreboard
+        cellSize={cellSize}
+        difficulty={difficulty}
+        gamesPlayed={played}
+        gamesSurvived={survived}
+      />
       <div className='flex max-h-full w-full max-w-full flex-1 items-center justify-center overflow-auto'>
         {gameOver ? (
-          <GameOver initializeGame={initializeGame} setSurvived={setSurvived} />
+          <GameOver initializeGame={initializeGame} setPlayed={setPlayed} />
         ) : gameWon ? (
-          <GameWon initializeGame={initializeGame} setSurvived={setSurvived} />
+          <GameWon
+            initializeGame={initializeGame}
+            setPlayed={setPlayed}
+            setSurvived={setSurvived}
+          />
         ) : (
           <div
             className='grid border-4 border-gray-700 bg-gray-900 p-2'
@@ -242,7 +254,7 @@ export function GameBoard() {
         )}
       </div>
       {!gameOver && !gameWon && (
-        <div className='mt-4'>
+        <div className='mt-1'>
           <CharacterSelect
             playerType={playerType}
             setPlayerType={setPlayerType}
