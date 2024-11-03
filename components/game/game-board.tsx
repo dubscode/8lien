@@ -1,11 +1,18 @@
 'use client';
 
 import { CellType, CharacterType, NPC, Position } from '@/lib/types';
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp
+} from 'lucide-react';
 import { GRID_SIZE, generateMaze, sprites } from '@/lib/game';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'convex/react';
 
 import { ArcadeButton } from './arcade-button';
+import { Button } from '../ui/button';
 import { CharacterSelect } from './character-select';
 import { GameOver } from './game-over';
 import { GameWon } from './game-won';
@@ -31,6 +38,23 @@ export function GameBoard() {
   const [playerId, setPlayerId] = useState<string | null>(null);
 
   const player = useQuery(api.players.getPlayer, { playerId });
+
+  const movePlayer = (dx: number, dy: number) => {
+    if (gameOver) return;
+
+    setPlayerPosition((prev) => {
+      const newX = Math.max(0, Math.min(GRID_SIZE - 1, prev.x + dx));
+      const newY = Math.max(0, Math.min(GRID_SIZE - 1, prev.y + dy));
+      if (maze[newY][newX] !== 'wall') {
+        if (maze[newY][newX] === 'airlock') {
+          handleGameWon();
+        } else {
+          return { x: newX, y: newY };
+        }
+      }
+      return prev;
+    });
+  };
 
   useEffect(() => {
     if (player) {
@@ -347,6 +371,42 @@ export function GameBoard() {
           </p>
         </div>
       )}
+      <div className='fixed bottom-4 left-4 grid grid-cols-3 gap-2 md:hidden'>
+        <div></div>
+        <Button
+          variant='outline'
+          size='icon'
+          onClick={() => movePlayer(0, -1)}
+          aria-label='Move Up'
+        >
+          <ChevronUp className='h-4 w-4' />
+        </Button>
+        <div></div>
+        <Button
+          variant='outline'
+          size='icon'
+          onClick={() => movePlayer(-1, 0)}
+          aria-label='Move Left'
+        >
+          <ChevronLeft className='h-4 w-4' />
+        </Button>
+        <Button
+          variant='outline'
+          size='icon'
+          onClick={() => movePlayer(0, 1)}
+          aria-label='Move Down'
+        >
+          <ChevronDown className='h-4 w-4' />
+        </Button>
+        <Button
+          variant='outline'
+          size='icon'
+          onClick={() => movePlayer(1, 0)}
+          aria-label='Move Right'
+        >
+          <ChevronRight className='h-4 w-4' />
+        </Button>
+      </div>
     </div>
   );
 }
