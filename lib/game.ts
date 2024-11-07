@@ -1,23 +1,28 @@
 import { CellType, Difficulty, Sprites } from '@/lib/types';
 
+import airlock from '@/assets/airlock.webp';
+import android from '@/assets/droid.png';
+import astronaut from '@/assets/astronaut.png';
+import chestburster from '@/assets/chestburster.png';
+import facehugger from '@/assets/facehugger.png';
+import man from '@/assets/marine2.webp';
+import mostly from '@/assets/mostly.png';
+import woman from '@/assets/woman.png';
+import xeno from '@/assets/xenomorph.png';
+
 export const GRID_SIZE = 20;
 export const CELL_SIZE = 40;
 
 export const sprites: Sprites = {
-  airlock:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/airlock.webp',
-  android: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/droid.png',
-  chestburster:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/chestburster.png',
-  facehugger:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/facehugger.png',
-  man: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/marine2.webp',
-  mostly: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/mostly.png',
-  spacesuit:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/astronaut.png',
-  woman: 'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/woman.png',
-  xenomorph:
-    'https://ourqmsy63pjkoxcb.public.blob.vercel-storage.com/xenomorph.png'
+  airlock: airlock.src,
+  android: android.src,
+  chestburster: chestburster.src,
+  facehugger: facehugger.src,
+  man: man.src,
+  mostly: mostly.src,
+  spacesuit: astronaut.src,
+  woman: woman.src,
+  xenomorph: xeno.src
 };
 
 export function generateMaze(
